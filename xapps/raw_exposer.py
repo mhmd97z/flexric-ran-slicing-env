@@ -1,17 +1,11 @@
-import xapp_sdk as ric
-import time
-import json
+import time, sys, json, logging, argparse
 from collections import defaultdict
-import argparse
-import logging
+from os import path
+# sys.path.append(path.dirname( path.dirname( path.abspath(__file__))))
+from configs import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list, metrics_path, slice_indication_path, EXPOSER_UPDATE_PERIOD
+import xapp_sdk as ric
 
-HANDLER_PAUSE = 0.00001
 logging.basicConfig(level=logging.DEBUG) # DEBUG INFO 
-
-mac_kpi_list = ['dl_aggr_tbs', 'ul_aggr_tbs', 'dl_aggr_bytes_sdus', 'ul_aggr_bytes_sdus', 'dl_curr_tbs', 'ul_curr_tbs', 'dl_sched_rb', 'ul_sched_rb', 'pusch_snr', 'pucch_snr', 'dl_bler', 'ul_bler', 'dl_num_harq', 'ul_num_harq', 'rnti', 'dl_aggr_prb', 'ul_aggr_prb', 'dl_aggr_sdus', 'ul_aggr_sdus', 'dl_aggr_retx_prb', 'ul_aggr_retx_prb', 'bsr', 'frame', 'slot', 'wb_cqi', 'dl_mcs1', 'ul_mcs1', 'dl_mcs2', 'ul_mcs2', 'phr']
-rlc_kpi_list = ['txpdu_pkts', 'txpdu_bytes', 'txpdu_wt_ms', 'txpdu_dd_pkts', 'txpdu_dd_bytes', 'txpdu_retx_pkts', 'txpdu_retx_bytes', 'txpdu_segmented', 'txpdu_status_pkts', 'txpdu_status_bytes', 'txbuf_occ_bytes', 'txbuf_occ_pkts', 'rxpdu_pkts', 'rxpdu_bytes', 'rxpdu_dup_pkts', 'rxpdu_dup_bytes', 'rxpdu_dd_pkts', 'rxpdu_dd_bytes', 'rxpdu_ow_pkts', 'rxpdu_ow_bytes', 'rxpdu_status_pkts', 'rxpdu_status_bytes', 'rxbuf_occ_bytes', 'rxbuf_occ_pkts', 'txsdu_pkts', 'txsdu_bytes', 'rxsdu_pkts', 'rxsdu_bytes', 'rxsdu_dd_pkts', 'rxsdu_dd_bytes', 'rnti', 'mode', 'rbid']
-pdcp_kpi_list = ['txpdu_pkts', 'txpdu_bytes', 'txpdu_sn', 'rxpdu_pkts', 'rxpdu_bytes', 'rxpdu_sn', 'rxpdu_oo_pkts', 'rxpdu_oo_bytes', 'rxpdu_dd_pkts', 'rxpdu_dd_bytes', 'rxpdu_ro_count', 'txsdu_pkts', 'txsdu_bytes', 'rxsdu_pkts', 'rxsdu_bytes', 'rnti', 'mode', 'rbid']
-
 
 ####################
 #### MAC INDICATION CALLBACK
@@ -34,10 +28,10 @@ class MACCallback(ric.mac_cb):
             kpi_stats = {}
 
         stats_json = json.dumps(kpi_stats)
-        with open("stats/exporter_stats_mac.json", "w") as outfile:
+        with open(metrics_path["mac"], "w") as outfile:
             outfile.write(stats_json)
             
-        time.sleep(HANDLER_PAUSE)
+        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 #### RLC INDICATION CALLBACK
@@ -59,10 +53,10 @@ class RLCCallback(ric.rlc_cb):
             kpi_stats = {}
             
         stats_json = json.dumps(kpi_stats)
-        with open("stats/exporter_stats_rlc.json", "w") as outfile:
+        with open(metrics_path["rlc"], "w") as outfile:
             outfile.write(stats_json)
 
-        time.sleep(HANDLER_PAUSE)
+        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 #### PDCP INDICATION CALLBACK
@@ -85,11 +79,10 @@ class PDCPCallback(ric.pdcp_cb):
             kpi_stats = {}
             
         stats_json = json.dumps(kpi_stats)
-        with open("stats/exporter_stats_pdcp.json", "w") as outfile:
+        with open(metrics_path["pdcp"], "w") as outfile:
             outfile.write(stats_json)
 
-        time.sleep(HANDLER_PAUSE)
-
+        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 #### SLICE INDICATION CALLBACK
@@ -194,13 +187,10 @@ def slice_ind_to_dict_json(ind):
             ue_dict["ues"].append(ues_dict)
             # assoc_rnti = u.rnti
 
-    ind_dict = slice_stats
-    ind_json = json.dumps(ind_dict)
+    ind_json = json.dumps(slice_stats)
 
-    with open("stats/exporter_stats_slice.json", "w") as outfile:
+    with open(slice_indication_path, "w") as outfile:
         outfile.write(ind_json)
-
-    time.sleep(HANDLER_PAUSE)
 
 class SLICECallback(ric.slice_cb):
     # Define Python class 'constructor'
@@ -218,8 +208,7 @@ class SLICECallback(ric.slice_cb):
         #    print('UE ASSOC SLICE STATE: len_ue_slice = ' + str(ind.ue_slice_stats.len_ue_slice))
         logging.debug("slice handler is invoked")
         slice_ind_to_dict_json(ind)
-        time.sleep(HANDLER_PAUSE)
-
+        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 ####################

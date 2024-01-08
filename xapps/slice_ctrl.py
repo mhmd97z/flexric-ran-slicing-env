@@ -1,9 +1,6 @@
-import xapp_sdk as ric
-import time
-import json
-import argparse
+import time, argparse, logging
 from slice_ctrl_messages import *
-import logging
+import xapp_sdk as ric
 
 ####################
 ####  SLICE CONTROL FUNCS

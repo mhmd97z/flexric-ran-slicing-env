@@ -1,27 +1,9 @@
-import time, threading, json
+import time, json, sys, logging, sys
+from configs import imsi_slice_path, ASSOCIATOR_UPDATE_PERIOD
+from utils import get_rnti 
 import xapp_sdk as ric
-import sys, logging
+
 logging.getLogger().setLevel(logging.DEBUG)
-
-rnti_imsi_path = "/home/mzi/ran_slicing_flexric/flexric/build/examples/xApp/python3/stats/rnti_imsi.json"
-imsi_slice_path ="/home/mzi/ran_slicing_flexric/flexric/build/examples/xApp/python3/imsi_slice_mapping_dict.json"
-
-def get_rnti(imsi):
-    try:
-        f = open(rnti_imsi_path, 'r')
-        rnti_imsi = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
-        return None
-
-    rntis = [k for k, v in rnti_imsi.items() if v == imsi]
-
-    if len(rntis) > 0:
-        return rntis[-1]
-    else:
-        return None
-
 
 def fill_slice_ctrl_msg(items):
     msg = ric.slice_ctrl_msg_t()
@@ -47,7 +29,7 @@ def associator(conn):
         sys.exit(1)
 
     items = [(get_rnti(imsi), imsi, slice_id) for imsi, slice_id in imsi_slice_mapping.items() if get_rnti(imsi) is not None]
-    logging.debug("in associator: items: {}".format(items))
+    logging.debug("target association: {}".format(items))
 
     # generate the message
     if len(items) > 0:        
@@ -55,11 +37,11 @@ def associator(conn):
         try:
             ric.control_slice_sm(conn[0].id, msg)
         except:
-            logging.info("skipping association!")
+            logging.info("skipping association message!")
     else: 
         logging.info("no items to enforce")
-        
-    
+
+
 if __name__ == "__main__":
     ric.init()
     conn = ric.conn_e2_nodes()
@@ -68,6 +50,10 @@ if __name__ == "__main__":
     while True:
         try:
             associator(conn)
-            time.sleep(0.5)
+            time.sleep(ASSOCIATOR_UPDATE_PERIOD)
         except:
+            # Avoid deadlock. ToDo revise architecture 
+            while ric.try_stop == 0:
+                time.sleep(1)
+
             sys.exit(1)

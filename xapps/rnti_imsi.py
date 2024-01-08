@@ -2,16 +2,15 @@ import time
 import json
 import threading
 import logging
+from configs import rnti_imsi_path, rnti_teid_path, imsi_teid_path, TEID_IMSI_UPDATE_PERIOD, RNTI_TEID_UPDATE_PERIOD
 logging.basicConfig(level=logging.INFO) # DEBUG INFO
-
-RNTI_TEID_PATH = "/home/mzi/tunnel_rnti.txt"
-IMSI_TEID_PATH = "/home/mzi/imsi_teid.txt"
 
 def dump_mapping():
     logging.debug("dump_mapping is invoked")
     global rnti_imsi_dict
+    print('rnti_imsi_dict: ', rnti_imsi_dict)
     rnti_imsi_json = json.dumps(rnti_imsi_dict)
-    with open("stats/rnti_imsi.json", "w") as outfile:
+    with open(rnti_imsi_path, "w") as outfile:
         outfile.write(rnti_imsi_json)
     
 def build_rnti_imsi_mapping():
@@ -19,10 +18,9 @@ def build_rnti_imsi_mapping():
     global rnti_imsi_dict
     for rnti, teid in rnti_teid_dict.items():
         while not teid in teid_imsi_dict:
-            time.sleep(0.5)
+            time.sleep(TEID_IMSI_UPDATE_PERIOD * 3)
             print("teid_imsi_dict not up to date")
         rnti_imsi_dict[rnti] = teid_imsi_dict[teid]
-    print('rnti_imsi_dict: ', rnti_imsi_dict)
 
 ####################
 #### RNTI TO TEID 
@@ -30,7 +28,6 @@ def build_rnti_imsi_mapping():
 class RntiTeid(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.rnti_teid_path = RNTI_TEID_PATH
 
     def update_rnti_teid_dict(self, line):
         line_items = line.split(" ")
@@ -58,7 +55,7 @@ class RntiTeid(threading.Thread):
     
     def run(self):
         # iterate through the existing lines
-        rnti_teid = open(self.rnti_teid_path, "r")
+        rnti_teid = open(rnti_teid_path, "r")
         for iter, line in enumerate(rnti_teid.readlines()):
             if len(line.split(" ")) == 3:
                 self.update_rnti_teid_dict(line)
@@ -73,7 +70,7 @@ class RntiTeid(threading.Thread):
 
         # poll new lines and process them
         while True:
-            rnti_teid = open(self.rnti_teid_path, "r")
+            rnti_teid = open(rnti_teid_path, "r")
             lines = rnti_teid.readlines()
             if len(lines) > last_line_count:
                 for i in range(last_line_count, len(lines)):
@@ -87,7 +84,7 @@ class RntiTeid(threading.Thread):
                 dump_mapping()
 
             rnti_teid.close()
-            time.sleep(0.3)
+            time.sleep(RNTI_TEID_UPDATE_PERIOD)
 
 
 ####################
@@ -96,7 +93,6 @@ class RntiTeid(threading.Thread):
 class TeidImsi(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.teid_imsi_path = IMSI_TEID_PATH
 
     def update_teid_imsi_dict(self, line):
         line_items = line.split(" ")
@@ -108,7 +104,7 @@ class TeidImsi(threading.Thread):
 
     def run(self):
         # iterate through the existing lines
-        teid_imsi = open(self.teid_imsi_path, "r")
+        teid_imsi = open(imsi_teid_path, "r")
         for iter, line in enumerate(teid_imsi.readlines()):
             if len(line.split(" ")) == 3:
                 self.update_teid_imsi_dict(line)
@@ -123,7 +119,7 @@ class TeidImsi(threading.Thread):
 
         # poll new lines and process them
         while True:
-            teid_imsi = open(self.teid_imsi_path, "r")
+            teid_imsi = open(imsi_teid_path, "r")
             lines = teid_imsi.readlines()
             if len(lines) > last_line_count:
                 for i in range(last_line_count, len(lines)):
@@ -134,7 +130,7 @@ class TeidImsi(threading.Thread):
                         pass
 
             teid_imsi.close()
-            time.sleep(0.1)
+            time.sleep(TEID_IMSI_UPDATE_PERIOD)
 
 if __name__ == '__main__':
     # RNTI-IMSI
