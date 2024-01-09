@@ -2,7 +2,7 @@ import time, sys, json, logging, argparse
 from collections import defaultdict
 from os import path
 # sys.path.append(path.dirname( path.dirname( path.abspath(__file__))))
-from configs import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list, metrics_path, slice_indication_path, EXPOSER_UPDATE_PERIOD
+from configs import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list, metrics_path, slice_indication_path
 import xapp_sdk as ric
 
 logging.basicConfig(level=logging.DEBUG) # DEBUG INFO 
@@ -31,7 +31,6 @@ class MACCallback(ric.mac_cb):
         with open(metrics_path["mac"], "w") as outfile:
             outfile.write(stats_json)
             
-        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 #### RLC INDICATION CALLBACK
@@ -56,7 +55,6 @@ class RLCCallback(ric.rlc_cb):
         with open(metrics_path["rlc"], "w") as outfile:
             outfile.write(stats_json)
 
-        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 #### PDCP INDICATION CALLBACK
@@ -81,8 +79,6 @@ class PDCPCallback(ric.pdcp_cb):
         stats_json = json.dumps(kpi_stats)
         with open(metrics_path["pdcp"], "w") as outfile:
             outfile.write(stats_json)
-
-        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 #### SLICE INDICATION CALLBACK
@@ -208,7 +204,6 @@ class SLICECallback(ric.slice_cb):
         #    print('UE ASSOC SLICE STATE: len_ue_slice = ' + str(ind.ue_slice_stats.len_ue_slice))
         logging.debug("slice handler is invoked")
         slice_ind_to_dict_json(ind)
-        time.sleep(EXPOSER_UPDATE_PERIOD)
 
 ####################
 ####################

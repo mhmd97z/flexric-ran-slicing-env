@@ -22,8 +22,7 @@ metrics_exporter['rlc']['txbuf_occ_bytes'] = prom.Gauge('txbuf_occ_bytes', 'curr
 metrics_exporter['rlc']['rxbuf_occ_pkts'] = prom.Gauge('rxbuf_occ_pkts', 'current tx bufer occupancy in terms of number of bytes', ['imsi'])
 metrics_exporter['rlc']['txbuf_occ_pkts'] = prom.Gauge('txbuf_occ_pkts', 'current tx bufer occupancy in terms of number of packets', ['imsi'])
 
-# slice_throughput = prom.Gauge('slice_throughput', 'Throughput (bytes) per slice', ['slice_id'])
-
+slice_throughput = prom.Gauge('slice_throughput', 'Throughput (bytes) per slice', ['slice_id'])
 
 metrics_list = {
     'mac': [

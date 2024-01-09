@@ -1,0 +1,2 @@
+#!/bin/bash
+watch -ctn1 "column -s, -t < exporter_stats_slice.csv | less -#2 -N -S"
