@@ -77,7 +77,7 @@ class PDCPCallback(ric.pdcp_cb):
                     kpi_stats[item.rnti]["pdcp"][kpi] = eval('item.{}'.format(kpi))
         else:
             kpi_stats = {}
-            
+        
         stats_json = json.dumps(kpi_stats)
         with open(metrics_path["pdcp"], "w") as outfile:
             outfile.write(stats_json)

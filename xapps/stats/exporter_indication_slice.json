@@ -1,0 +1,1 @@
+{"RAN": {"dl": {"num_of_slices": 0, "slice_sched_algo": "null", "ue_sched_algo": "time_pf"}}, "UE": {"num_of_ues": 4, "ues": [{"rnti": 73, "assoc_dl_slice_id": "null"}, {"rnti": 116, "assoc_dl_slice_id": "null"}, {"rnti": 117, "assoc_dl_slice_id": "null"}, {"rnti": 118, "assoc_dl_slice_id": "null"}]}}

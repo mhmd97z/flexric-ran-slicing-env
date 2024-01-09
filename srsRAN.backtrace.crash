@@ -199,3 +199,23 @@
 	/lib/x86_64-linux-gnu/libpthread.so.0(+0x8609) [0x7fc86b323609]
 	/lib/x86_64-linux-gnu/libc.so.6(clone+0x43) [0x7fc86a9d2353]
 
+--- command='/home/mzi/srsRAN_b/build/srsenb/src/srsenb' version=21.10.0 signal=11 date='09/01/2024 15:08:03' ---
+	/home/mzi/srsRAN_b/build/srsenb/src/srsenb(+0x35317f) [0x55956936d17f]
+	/lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f77288a1090]
+	[0x559571ef6fb0]
+
+--- command='/home/mzi/srsRAN_b/build/srsenb/src/srsenb' version=21.10.0 signal=11 date='09/01/2024 15:46:41' ---
+	/home/mzi/srsRAN_b/build/srsenb/src/srsenb(+0x35317f) [0x560c6885317f]
+	/lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f4f48216090]
+	[0x560c70f20fb0]
+
+--- command='/home/mzi/srsRAN_b/build/srsenb/src/srsenb' version=21.10.0 signal=11 date='09/01/2024 16:22:34' ---
+	/home/mzi/srsRAN_b/build/srsenb/src/srsenb(+0x35317f) [0x55c47c0f117f]
+	/lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f08a015c090]
+	[0x55c4844abfb0]
+
+--- command='/home/mzi/srsRAN_b/build/srsenb/src/srsenb' version=21.10.0 signal=11 date='09/01/2024 16:38:11' ---
+	/home/mzi/srsRAN_b/build/srsenb/src/srsenb(+0x35317f) [0x56161739517f]
+	/lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f525a0da090]
+	[0x56161f898fb0]
+

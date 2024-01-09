@@ -1,12 +1,13 @@
 # Prometheus exporter
 EXPORTER_PORT = 9000
-EXPORTER_UPDATE_PERIOD = 3
+EXPORTER_UPDATE_PERIOD = 1
+PROMETHEUS_URL = "http://129.97.168.51:30090"
 
 # ue-slice association
 ASSOCIATOR_UPDATE_PERIOD = 0.5
 
 # raw exposer
-EXPOSER_UPDATE_PERIOD = 0.00001
+EXPOSER_UPDATE_PERIOD = 0.5
 
 # RNTI-IMSI Mapping
 TEID_IMSI_UPDATE_PERIOD = 0.1
@@ -16,9 +17,13 @@ RNTI_TEID_UPDATE_PERIOD = 0.3
 metrics_path = {"mac": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_mac.json",
                 "rlc": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_rlc.json",
                 "pdcp": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_pdcp.json"}
-slice_indication_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_slice.json"
+
+# slicing
+slice_indication_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_indication_slice.json"
+imsi_slice_path ="/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/imsi_slice_mapping_dict.json"
+
+# RNTI-IMSI stuff
 rnti_imsi_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/rnti_imsi.json"
-imsi_slice_path ="/home/mzi/ran_slicing_flexric-gym/flexric/build/examples/xApp/python3/imsi_slice_mapping_dict.json"
 rnti_teid_path = "/home/mzi/tunnel_rnti.txt"
 imsi_teid_path = "/home/mzi/imsi_teid.txt"
 

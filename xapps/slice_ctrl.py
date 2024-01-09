@@ -2,6 +2,8 @@ import time, argparse, logging
 from slice_ctrl_messages import *
 import xapp_sdk as ric
 
+logging.basicConfig(level=logging.INFO) # DEBUG INFO 
+
 ####################
 ####  SLICE CONTROL FUNCS
 ####################
