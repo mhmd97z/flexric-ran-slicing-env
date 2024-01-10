@@ -39,6 +39,8 @@ def push_metrics(sm="mac"):
                     value = data[rnti][sm][metrics_keys[iter_]]
                     metric.labels(imsi=imsi).set(value)
                 print("{} metrics are pushed for imsi {}".format(sm, imsi))
+            else:
+                logging.info("no imsi was found for rnti {}".format(rnti))
 
     else:
         logging.info("no {} metrics found".format(sm))

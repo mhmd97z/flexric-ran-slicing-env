@@ -24,7 +24,7 @@ def fill_slice_ctrl_msg(items):
 
 def associator(conn):
     imsi_slice_mapping = get_imsi_slice()
-    items = [(get_rnti(imsi), imsi, slice_id) for imsi, slice_id in imsi_slice_mapping.items() if get_rnti(imsi) is not None]
+    items = [(get_rnti(imsi), imsi, slice_id, hex(int(get_rnti(imsi)))) for imsi, slice_id in imsi_slice_mapping.items() if get_rnti(imsi) is not None]
     logging.debug("target association: {}".format(items))
 
     global curr_imsi_slice
@@ -32,13 +32,15 @@ def associator(conn):
     curr_rnti_imsi_len = get_rnti_imsi_len()
     curr_imsi_slice = imsi_slice_mapping
 
+
     # generate the message
     if len(items) > 0:
-        msg = fill_slice_ctrl_msg(items)
-        try:
-            ric.control_slice_sm(conn[0].id, msg)
-        except:
-            logging.info("skipping association message!")
+        for item in items:
+            msg = fill_slice_ctrl_msg([item])
+            try:
+                ric.control_slice_sm(conn[0].id, msg)
+            except:
+                logging.info("skipping association message!")
     else: 
         logging.info("no items to enforce")
 
@@ -51,11 +53,11 @@ def runner(conn):
     new_rnti_imsi_len = get_rnti_imsi_len()
 
     if new_imsi_slice != curr_imsi_slice:
-        logging.debug("new imsi slice mapping is detected!")
+        logging.debug("\n\n\nnew imsi slice mapping is detected!")
         associator(conn)
 
     if new_rnti_imsi_len != curr_rnti_imsi_len:
-        logging.debug("new imsi rnti mapping is detected!")
+        logging.debug("\n\n\nnew imsi-rnti!")
         associator(conn)
 
 

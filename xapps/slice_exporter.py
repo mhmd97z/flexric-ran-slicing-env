@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import json, logging, time
 from configs import PROMETHEUS_URL, SLICE_EXPORTER_PORT, EXPORTER_UPDATE_PERIOD, slice_stats_path
-from metrics import slice_throughput
+from metrics import metrics_exporter, metrics_exporter_slice_mapping
 from utils import get_imsi_slice
 
 logging.basicConfig(level=logging.INFO)
@@ -21,16 +21,25 @@ prom.REGISTRY.unregister(prom.GC_COLLECTOR)
 
 
 def send_query():
-    r = requests.get(url=PROMETHEUS_URL + '/api/v1/query', params=PROM_PARAMS)
-    data = r.json()
+    data_list = {}
+    kpis_label = list(metrics_exporter['slice'].keys())
+    kpis_label.remove("slice_active_users")
+    for metric in kpis_label:
+        r = requests.get(url=PROMETHEUS_URL + '/api/v1/query', params={'query': metric})
+        data = r.json()
+        if data['status'] == 'success':
+            for item in data['data']['result']:
+                if not item['metric']['imsi'] in data_list:
+                    data_list[item['metric']['imsi']] = []
+                data_list[item['metric']['imsi']].append(float(item['value'][1]))
 
-    if data['status'] == 'success':
-        data_list = []
-        for item in data['data']['result']:
-            data_list.append((item['metric']['imsi'], float(item['value'][0]), float(item['value'][1])))
+    data = []
+    for imsi, kpis in data_list.items():
+        data.append([imsi] + kpis)
 
-        return pd.DataFrame(data_list, columns=['imsi', 'timestamp', 'throughput'])
-        
+    if len(data) > 0:
+        return pd.DataFrame(data, columns=['imsi'] + kpis_label)
+
     else:
         return None
 
@@ -40,9 +49,12 @@ def get_imsi_slice_df():
     return pd.DataFrame(get_imsi_slice_mapping.items(), columns=['imsi', 'slice_id'])
 
 def exporter(df):
-    
+    metrics_labels = list(df.columns)
+    metrics_labels.remove('slice_id')
     for _, row in df.iterrows():
-        slice_throughput.labels(slice_id= int(row['slice_id'])).set(float(row['slice_throughput']))
+        for metric_label in metrics_labels: 
+            metrics_exporter['slice'][metrics_exporter_slice_mapping[metric_label]]\
+                .labels(slice_id= int(row['slice_id'])).set(float(row[metric_label]))
 
 def run_kpi_computation():
     kpi_df = send_query()
@@ -51,11 +63,17 @@ def run_kpi_computation():
     if kpi_df is not None and imsi_slice_df is not None:
         df = pd.merge(kpi_df, imsi_slice_df, on='imsi')
         agg_df = df.groupby('slice_id').agg( \
-            slice_throughput= ('throughput', 'mean'),
-            active_user_count= ('throughput', 'count')
+            slice_dl_throughput= ('rate(ul_aggr_tbs[10s])', 'mean'),
+            slice_ul_throughput= ('rate(dl_aggr_tbs[10s])', 'mean'),
+            slice_phr= ('phr', 'mean'),
+            slice_cqi= ('wb_cqi', 'mean'),
+            slice_active_users= ('wb_cqi', 'count')
         ).reset_index()
+        
+        print(agg_df)
 
-        agg_df.to_csv(slice_stats_path, encoding='utf-8')
+        print(slice_stats_path)
+        agg_df.to_csv(slice_stats_path, index=False, encoding='utf-8')
 
         exporter(agg_df)
 

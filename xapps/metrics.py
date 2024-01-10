@@ -1,6 +1,6 @@
 import prometheus_client as prom
 
-metrics_exporter = {'mac': {}, 'rlc': {}, 'pdcp': {}}
+metrics_exporter = {'mac': {}, 'rlc': {}, 'pdcp': {}, 'slice': {}}
 
 metrics_exporter['mac']['dl_aggr_tbs'] = prom.Gauge('dl_aggr_tbs', 'downlink aggregated transfer block size', ['imsi'])
 metrics_exporter['mac']['ul_aggr_tbs'] = prom.Gauge('ul_aggr_tbs', 'uplink aggregated transfer block size', ['imsi'])
@@ -22,7 +22,19 @@ metrics_exporter['rlc']['txbuf_occ_bytes'] = prom.Gauge('txbuf_occ_bytes', 'curr
 metrics_exporter['rlc']['rxbuf_occ_pkts'] = prom.Gauge('rxbuf_occ_pkts', 'current tx bufer occupancy in terms of number of bytes', ['imsi'])
 metrics_exporter['rlc']['txbuf_occ_pkts'] = prom.Gauge('txbuf_occ_pkts', 'current tx bufer occupancy in terms of number of packets', ['imsi'])
 
-slice_throughput = prom.Gauge('slice_throughput', 'Throughput (bytes) per slice', ['slice_id'])
+metrics_exporter['slice']['rate(dl_aggr_tbs[10s])'] = prom.Gauge('slice_dl_throughput', 'Downlink Throughput (bytes) per slice', ['slice_id'])
+metrics_exporter['slice']['rate(ul_aggr_tbs[10s])'] = prom.Gauge('slice_ul_throughput', 'Uplink Throughput (bytes) per slice', ['slice_id'])
+metrics_exporter['slice']['phr'] = prom.Gauge('slice_phr', 'Power headroom', ['slice_id'])
+metrics_exporter['slice']['wb_cqi'] = prom.Gauge('slice_cqi', 'Chennel Quality', ['slice_id'])
+metrics_exporter['slice']['slice_active_users'] = prom.Gauge('slice_active_users', 'Chennel Quality', ['slice_id'])
+
+metrics_exporter_slice_mapping = {
+    'slice_dl_throughput': 'rate(dl_aggr_tbs[10s])',
+    'slice_ul_throughput': 'rate(ul_aggr_tbs[10s])',
+    'slice_phr': 'phr',
+    'slice_cqi': 'wb_cqi',
+    'slice_active_users': 'slice_active_users'
+}
 
 metrics_list = {
     'mac': [
