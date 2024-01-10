@@ -1,5 +1,5 @@
 import json, time
-from utils import get_metrics
+from configs import slice_stats_path
 
 class RanSlicingFlexricGym:
     def __init__(self) -> None:

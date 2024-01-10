@@ -2,7 +2,8 @@ import time, sys, json, logging, argparse
 from collections import defaultdict
 from os import path
 # sys.path.append(path.dirname( path.dirname( path.abspath(__file__))))
-from configs import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list, metrics_path, slice_indication_path
+from configs import metrics_path, slice_indication_path
+from metrics import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list
 import xapp_sdk as ric
 
 logging.basicConfig(level=logging.DEBUG) # DEBUG INFO 
