@@ -15,3 +15,4 @@ xapps/cmake_install.cmake
 xapps/_xapp_sdk.so
 xapps/Makefile
 xapps/CMakeFiles
+venv/*
