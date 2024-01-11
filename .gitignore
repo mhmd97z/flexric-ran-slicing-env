@@ -1,0 +1,17 @@
+old_xapps
+srs-ran-scripts
+srsRAN.backtrace.crash
+__pycache__
+flexric
+log.txt
+xapps/__pycache__
+xapps/xapp_slice_moni_ctrl.py
+xapps/xapp_sdk.py
+xapps/xapp_mac_rlc_pdcp_moni.py
+xapps/xapp_gtp_moni.py
+xapps/watch_slice_stats
+xapps/metrics_exporter.py
+xapps/cmake_install.cmake
+xapps/_xapp_sdk.so
+xapps/Makefile
+xapps/CMakeFiles
