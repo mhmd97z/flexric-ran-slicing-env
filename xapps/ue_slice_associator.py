@@ -1,6 +1,6 @@
 import time, json, sys, logging, sys
-from configs import imsi_slice_path, ASSOCIATOR_UPDATE_PERIOD
-from utils import get_rnti, get_rnti_imsi_len, get_imsi_slice
+from configs import slice_indication_path, ASSOCIATOR_UPDATE_PERIOD
+from utils import get_rnti, get_imsi, get_rnti_imsi_len, get_imsi_slice, get_ue_slice_indication
 
 import xapp_sdk as ric
 
@@ -22,51 +22,48 @@ def fill_slice_ctrl_msg(items):
     return msg
 
 
-def associator(conn):
-    imsi_slice_mapping = get_imsi_slice()
-    items = [(get_rnti(imsi), imsi, slice_id, hex(int(get_rnti(imsi)))) for imsi, slice_id in imsi_slice_mapping.items() if get_rnti(imsi) is not None]
-    logging.debug("target association: {}".format(items))
-
-    global curr_imsi_slice
-    global curr_rnti_imsi_len
-    curr_rnti_imsi_len = get_rnti_imsi_len()
-    curr_imsi_slice = imsi_slice_mapping
-
-
+def associator(conn, item):
     # generate the message
-    if len(items) > 0:
-        for item in items:
-            msg = fill_slice_ctrl_msg([item])
-            try:
-                ric.control_slice_sm(conn[0].id, msg)
-            except:
-                logging.info("skipping association message!")
-    else: 
-        logging.info("no items to enforce")
+    msg = fill_slice_ctrl_msg(item)
+    try:
+        ric.control_slice_sm(conn[0].id, msg)
+    except:
+        logging.info("skipping association message!")
 
+
+# def runner(conn):
+#     global curr_imsi_slice
+#     global curr_rnti_imsi_len
+
+#     new_imsi_slice = get_imsi_slice()
+#     new_rnti_imsi_len = get_rnti_imsi_len()
+
+#     if new_imsi_slice != curr_imsi_slice:
+#         logging.debug("\n\n\nnew imsi slice mapping is detected!")
+#         associator(conn)
+
+#     if new_rnti_imsi_len != curr_rnti_imsi_len:
+#         logging.debug("\n\n\nnew imsi-rnti!")
+#         associator(conn)
 
 def runner(conn):
-    global curr_imsi_slice
-    global curr_rnti_imsi_len
+    logging.info("rnti-slice mapping investigation")
+    ue_slice_indication = get_ue_slice_indication()
+    taget_imsi_slice = get_imsi_slice()
 
-    new_imsi_slice = get_imsi_slice()
-    new_rnti_imsi_len = get_rnti_imsi_len()
-
-    if new_imsi_slice != curr_imsi_slice:
-        logging.debug("\n\n\nnew imsi slice mapping is detected!")
-        associator(conn)
-
-    if new_rnti_imsi_len != curr_rnti_imsi_len:
-        logging.debug("\n\n\nnew imsi-rnti!")
-        associator(conn)
-
-
+    for ue_item in ue_slice_indication['ues']:
+        imsi = get_imsi(ue_item['rnti'], tolerant=False)
+        # print(ue_item['rnti'], ue_item['assoc_dl_slice_id'], get_imsi(ue_item['rnti'], tolerant=False))
+        if imsi != None:
+            if int(ue_item['assoc_dl_slice_id']) != int(taget_imsi_slice[str(imsi)]):
+                item = [(str(ue_item['rnti']), imsi, taget_imsi_slice[str(imsi)], hex(int(ue_item['rnti'])))]
+                logging.info("\n\nissuing a new mapping command: {}".format(item))
+                associator(conn, item)
+                logging.info("\n")
 if __name__ == "__main__":
     ric.init()
     conn = ric.conn_e2_nodes()
     assert(len(conn) > 0)
-
-    associator(conn)
 
     while True:
         try:

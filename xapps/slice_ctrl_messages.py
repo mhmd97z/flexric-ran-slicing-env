@@ -6,16 +6,16 @@ add_static_slices = {
     "slice_sched_algo" : "STATIC",
     "slices" : [
         {
-            "id" : 1,
+            "id" : 30,
             "label" : "s1",
             "ue_sched_algo" : "PF",
-            "slice_algo_params" : {"pos_low" : 1, "pos_high" : 3},
+            "slice_algo_params" : {"pos_low" : 1, "pos_high" : 4},
         },
         {
-            "id" : 2,
+            "id" : 32,
             "label" : "s2",
             "ue_sched_algo" : "PF",
-            "slice_algo_params" : {"pos_low" : 4, "pos_high" : 10},
+            "slice_algo_params" : {"pos_low" : 5, "pos_high" : 8},
         }
     ]
 }

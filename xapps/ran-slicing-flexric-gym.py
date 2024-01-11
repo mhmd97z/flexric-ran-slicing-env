@@ -1,5 +1,6 @@
 import json, time
 from configs import slice_stats_path
+import pandas as pd 
 
 class RanSlicingFlexricGym:
     def __init__(self) -> None:
@@ -11,9 +12,9 @@ class RanSlicingFlexricGym:
 
 
     def get_observation(self):
-        self.sm_imsi_metrocs = {}
-        for sm in ['mac', 'rlc', 'pdcp']:
-            self.sm_imsi_metrocs[sm] = get_metrics(sm)
+        df = pd.read_csv(slice_stats_path)
+        print(df)
+        
 
 
     def calculate_reward(self):
@@ -42,3 +43,7 @@ class RanSlicingFlexricGym:
     def step(self, action):
         self.calculate_state()
 
+
+if __name__ == '__main__':
+    env = RanSlicingFlexricGym()
+    env.get_observation()
