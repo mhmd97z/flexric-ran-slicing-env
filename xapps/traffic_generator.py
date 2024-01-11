@@ -26,78 +26,77 @@ a_phone = Phone(
 )
 a_phone.data_plane_ip = a_phone.control_plane_ip
 
-phones = [
+PHONES = [
     a_phone,
 ]
 
 
-class IperfTrafficGenerator():
-    def __init__(self, phone: Phone) -> None:
-        self.client_done = False
-        self.phone = phone
+def run_iperf_from_client(phone):
+    subprocess.run(["iperf3", "-c", phone.data_plane_ip])
 
-    def setup_iperf_server_on_phone(self):
-        client = paramiko.SSHClient()
-        client.load_system_host_keys()
-        client.connect(
-            self.phone.data_plane_ip, 
-            username=self.phone.username, 
-            password=self.phone.password, 
-            port=self.phone.port
-        )
 
-        PROMPT = r":/ #\s+"
+def setup_iperf_server_on_phone(phone):
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.connect(
+        phone.data_plane_ip, 
+        username=phone.username, 
+        password=phone.password, 
+        port=phone.port
+    )
+
+    PROMPT = r":/ #\s+"
+    try:
+        with SSHClientInteraction(client, timeout=10, display=True) as interact:
+            # get root access
+            interact.send("su")
+
+            # interact.expect(PROMPT)
+            interact.send("whoami")
+            interact.expect(".*root.*")
+
+            # start iperf3 server using pre-existing script on device
+            interact.send("/data/local/tmp/binaries/libs/arm64-v8a/iperf3.8 -s")
+
+            interact.tail(
+                line_prefix="pashmmm!",
+            )
+            # interact.expect()
+            print("done expecting after iperf3 server")
+
+            # interact.send('uname -a')
+            # # interact.expect(PROMPT)
+            # # cmd_output_uname = interact.current_output_clean
+            # cmd_output_uname = interact.current_output
+
+            interact.send('exit')
+            interact.expect()
+
+    except Exception as e:
+        print(e)
+    finally:
         try:
-            with SSHClientInteraction(client, timeout=10, display=True) as interact:
-                # get root access
-                interact.send("su")
-
-                # interact.expect(PROMPT)
-                interact.send("whoami")
-                interact.expect(".*root.*")
-
-                # start iperf3 server using pre-existing script on device
-                interact.send("/data/local/tmp/binaries/libs/arm64-v8a/iperf3.8 -s")
-
-                interact.tail(
-                    line_prefix="pashmmm!",
-                    stop_callback=lambda x: self.client_done,
-                )
-                # interact.expect()
-                print("done expecting after iperf3 server")
-
-                # interact.send('uname -a')
-                # # interact.expect(PROMPT)
-                # # cmd_output_uname = interact.current_output_clean
-                # cmd_output_uname = interact.current_output
-
-                interact.send('exit')
-                interact.expect()
-
-        except Exception as e:
-            print(e)
-        finally:
-            try:
-                client.close()
-            except Exception:
-                pass
+            client.close()
+        except Exception:
+            pass
 
 
-    def run_iperf_from_client(self):
-        subprocess.run(["iperf3", "-c", self.phone.control_plane_ip])
+def setup_iperf_servers(phones):
+    for phone in phones:
+        threading.Thread(target=setup_iperf_server_on_phone, args=(phone, )).start()
 
 
-    def run(self):
-        server_thread = threading.Thread(target=self.setup_iperf_server_on_phone)
-        client_thread = threading.Thread(target=self.run_iperf_from_client)
-        server_thread.start()
+
+def generate_traffic(phones):
+    setup_iperf_servers(phones)
+    threading.Thread(target=generate_intermittent_traffic, args=(phones,)).start()
+
+
+def generate_intermittent_traffic(phones):
+    while True:
         time.sleep(30)
-        client_thread.start()
-        client_thread.join()
-        self.client_done = True
-        server_thread.join()
+        for phone in phones:
+            threading.Thread(target=run_iperf_from_client, args=(phone,)).start()
 
 
-if __name__ == "__main__":
-    tg = IperfTrafficGenerator(a_phone);
-    tg.run()
+generate_traffic(PHONES)
