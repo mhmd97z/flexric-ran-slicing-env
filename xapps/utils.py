@@ -1,6 +1,8 @@
 import json, time
 slice_indication_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_indication_slice.json"
-from configs import rnti_imsi_path, imsi_slice_path, slice_indication_path
+from configs import rnti_imsi_path, imsi_slice_path, slice_indication_path, slicing_scheme_path
+from slice_ctrl_utils import fill_slice_scheme_ctrl_msg, fill_ue_slice_association_ctrl_msg
+import xapp_sdk as ric
 
 def get_imsi(rnti, tolerant=True):
     rnti = str(rnti)
@@ -36,29 +38,6 @@ def get_imsi(rnti, tolerant=True):
         else:
             return None
 
-def get_rnti_imsi_len():
-    try:
-        f = open(rnti_imsi_path, 'r')
-        rnti_imsi = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
-        return 0
-    
-    return len(rnti_imsi)
-
-
-def get_imsi_slice():
-    try: 
-        f = open(imsi_slice_path, 'r')
-        imsi_slice_mapping = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
-        return {}
-    
-    return imsi_slice_mapping
-
 
 def get_rnti(imsi):
     try:
@@ -76,6 +55,32 @@ def get_rnti(imsi):
     else:
         return None
 
+
+## Slicing related
+def get_imsi_slice():
+    try: 
+        f = open(imsi_slice_path, 'r')
+        imsi_slice_mapping = json.load(f)
+    except:
+        print("rnti_imsi json file not found")
+        print("skipping ...")
+        return {}
+    
+    return imsi_slice_mapping
+
+
+def get_slicing_scheme():
+    try:
+        f = open(slicing_scheme_path, 'r')
+        slicing_scheme = json.load(f)
+    except:
+        print("rnti_imsi json file not found")
+        print("skipping ...")
+        return None
+
+    return slicing_scheme
+
+
 def get_ue_slice_indication():
     try:
         f = open(slice_indication_path, 'r')
@@ -86,3 +91,28 @@ def get_ue_slice_indication():
         return None
     
     return slice_indication_mapping['UE']
+
+
+def set_slice(reset=False):
+    ric.init()
+    conn = ric.conn_e2_nodes()
+    assert(len(conn) > 0)
+    node_idx = 0
+
+    if reset:
+        slicing_scheme = {"num_slices" : 0}
+    else:
+        slicing_scheme = get_slicing_scheme()
+    msg = fill_slice_scheme_ctrl_msg(ric, slicing_scheme)
+    ric.control_slice_sm(conn[node_idx].id, msg)
+
+    # Avoid deadlock. ToDo revise architecture 
+    while ric.try_stop == 0:
+        time.sleep(1)
+    
+
+def ue_slice_associator(ric, conn, item):
+    node_idx = 0
+    msg = fill_ue_slice_association_ctrl_msg(ric, item)
+    ric.control_slice_sm(conn[node_idx].id, msg)
+    

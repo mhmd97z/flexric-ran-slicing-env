@@ -16,10 +16,14 @@ metrics_path = {"mac": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples
                 "rlc": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_rlc.json",
                 "pdcp": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_pdcp.json"}
 
-# slicing
+# slicing config
+imsi_slice_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/imsi_slice_mapping_dict.json"
+slicing_scheme_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/slicing_scheme.json"
+
+# slicing indication
 slice_indication_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_indication_slice.json"
 slice_stats_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_slice.csv"
-imsi_slice_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/imsi_slice_mapping_dict.json"
+
 
 # RNTI-IMSI 
 rnti_imsi_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/rnti_imsi.json"

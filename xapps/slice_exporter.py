@@ -8,17 +8,13 @@ from utils import get_imsi_slice
 
 logging.basicConfig(level=logging.INFO)
 
-requests.packages.urllib3.disable_warnings(
-    requests.packages.urllib3.exceptions.InsecureRequestWarning
-)
-
-PROM_PARAMS = {'query': 'rate(dl_aggr_tbs[1m])'}  # per-second derivative of range vector
-
 # get rid of bloat
 prom.REGISTRY.unregister(prom.PROCESS_COLLECTOR)
 prom.REGISTRY.unregister(prom.PLATFORM_COLLECTOR)
 prom.REGISTRY.unregister(prom.GC_COLLECTOR)
-
+requests.packages.urllib3.disable_warnings(
+    requests.packages.urllib3.exceptions.InsecureRequestWarning
+)
 
 def send_query():
     data_list = {}

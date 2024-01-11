@@ -20,16 +20,6 @@ add_static_slices = {
     ]
 }
 
-assoc_ue_slice = {
-    "num_ues" : 2,
-    "ues" : [
-        {
-            "rnti" : 0, # TODO: get rnti from slice_ind_to_dict_json()
-            "assoc_dl_slice_id" : 2
-        }
-    ]
-}
-
 ####################
 ####  SLICE CONTROL PARAMETER EXAMPLE - ADD SLICE
 ####################

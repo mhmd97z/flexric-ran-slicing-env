@@ -4,6 +4,7 @@ import pandas as pd
 
 class RanSlicingFlexricGym:
     def __init__(self) -> None:
+        # rm imsi_tmsi.txt, tunnel_rnti.txt
         # make sure the exposer and exporter scripts are running
         # make sure the slices are up
         # make sure the ue-slice association script is running
@@ -15,7 +16,6 @@ class RanSlicingFlexricGym:
         df = pd.read_csv(slice_stats_path)
         print(df)
         
-
 
     def calculate_reward(self):
         pass
@@ -29,6 +29,7 @@ class RanSlicingFlexricGym:
         # 
         return None
 
+
     def apply_action(self, action):
         # editing the json file 
         # calling the slice_ctrl --create to enforce the decision
@@ -37,7 +38,6 @@ class RanSlicingFlexricGym:
 
     def reward_caculation(self):
         state = self.calculate_state()
-
 
 
     def step(self, action):
