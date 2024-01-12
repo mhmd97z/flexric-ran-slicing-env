@@ -49,7 +49,7 @@ def push_metrics(sm="mac"):
 if __name__ == "__main__":
     prom.start_http_server(EXPORTER_PORT)
     logging.info("server is up")
-    logging.info("EXPORTER_UPDATE_PERIOD: ", EXPORTER_UPDATE_PERIOD)
+    logging.info("EXPORTER_UPDATE_PERIOD: ".format(EXPORTER_UPDATE_PERIOD))
 
     while True:
         logging.info("-- taking an exporter iteration")

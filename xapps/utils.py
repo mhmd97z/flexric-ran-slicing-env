@@ -1,9 +1,10 @@
-import json, time
-slice_indication_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_indication_slice.json"
-from configs import rnti_imsi_path, imsi_slice_path, slice_indication_path, slicing_scheme_path
+import json, time, configparser
+from configs import rnti_imsi_path, imsi_slice_path, slice_indication_path, slicing_scheme_path, srsran_config_path
 from slice_ctrl_utils import fill_slice_scheme_ctrl_msg, fill_ue_slice_association_ctrl_msg
-import xapp_sdk as ric
 
+###################
+## rnti-imsi
+###################
 def get_imsi(rnti, tolerant=True):
     rnti = str(rnti)
     try:
@@ -56,7 +57,18 @@ def get_rnti(imsi):
         return None
 
 
-## Slicing related
+###################
+# srsran config
+###################
+def get_prb_count():
+    parser = configparser.RawConfigParser()
+    parser.read(srsran_config_path+"/enb.conf")
+    return int(parser.get("enb", "n_prb"))
+
+
+###################
+## Slicing 
+###################
 def get_imsi_slice():
     try: 
         f = open(imsi_slice_path, 'r')
@@ -93,26 +105,40 @@ def get_ue_slice_indication():
     return slice_indication_mapping['UE']
 
 
-def set_slice(reset=False):
-    ric.init()
-    conn = ric.conn_e2_nodes()
-    assert(len(conn) > 0)
-    node_idx = 0
+def set_slice(decision=None, reset=False, ric_=None, conn=None):
+    if ric_ == None:
+        import xapp_sdk as ric
+        ric.init()
+        conn = ric.conn_e2_nodes()
+        assert(len(conn) > 0)
+        node_idx = 0
+    else:
+        ric = ric_
 
     if reset:
         slicing_scheme = {"num_slices" : 0}
     else:
         slicing_scheme = get_slicing_scheme()
+        if decision:
+            base = 0
+            for iter, (slice_id, prb) in enumerate(decision.items()):
+                slicing_scheme["slices"][iter]["id"] = int(slice_id)
+                slicing_scheme["slices"][iter]["slice_algo_params"]["pos_low"] = base
+                slicing_scheme["slices"][iter]["slice_algo_params"]["pos_high"] = base + prb - 1
+                base += prb - 1
+            print("slicing scheme: ", slicing_scheme)
+
     msg = fill_slice_scheme_ctrl_msg(ric, slicing_scheme)
-    ric.control_slice_sm(conn[node_idx].id, msg)
+    ric.control_slice_sm(conn[0].id, msg)
 
     # Avoid deadlock. ToDo revise architecture 
-    while ric.try_stop == 0:
-        time.sleep(1)
+    if ric_ == None:
+        while ric.try_stop == 0:
+            time.sleep(1)
     
 
 def ue_slice_associator(ric, conn, item):
     node_idx = 0
     msg = fill_ue_slice_association_ctrl_msg(ric, item)
     ric.control_slice_sm(conn[node_idx].id, msg)
-    
+

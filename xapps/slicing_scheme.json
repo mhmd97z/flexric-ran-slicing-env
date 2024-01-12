@@ -3,13 +3,13 @@
     "slice_sched_algo" : "STATIC",
     "slices" : [
         {
-            "id" : 30,
+            "id" : 1,
             "label" : "s1",
             "ue_sched_algo" : "PF",
             "slice_algo_params" : {"pos_low" : 1, "pos_high" : 4}
         },
         {
-            "id" : 32,
+            "id" : 2,
             "label" : "s2",
             "ue_sched_algo" : "PF",
             "slice_algo_params" : {"pos_low" : 5, "pos_high" : 8}
