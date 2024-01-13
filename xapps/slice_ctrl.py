@@ -1,7 +1,10 @@
-import time, argparse, logging
-import xapp_sdk as ric
+import logging
+import argparse
 from utils import set_slice
-logging.basicConfig(level=logging.INFO) # DEBUG INFO 
+
+
+logging.basicConfig(level=logging.INFO)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -14,10 +17,8 @@ if __name__ == '__main__':
     
     if args.create:
         set_slice()
-
     elif args.reset:
         set_slice(reset=True)
-
     else:
         logging.info('Are you serious?!')
     
