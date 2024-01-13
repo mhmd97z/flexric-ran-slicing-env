@@ -1,4 +1,4 @@
 paramiko
-pnadas
+pandas
 prometheus_client
 gym

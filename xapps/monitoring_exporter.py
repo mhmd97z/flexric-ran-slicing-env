@@ -42,23 +42,20 @@ def push_metrics(sm: str):
             logging.info("no imsi was found for rnti {}".format(rnti))
 
 
-if __name__ == "__main__":
-    prom.start_http_server(EXPORTER_PORT)
-    logging.info("server is up")
-    logging.info("EXPORTER_UPDATE_PERIOD: ".format(EXPORTER_UPDATE_PERIOD))
-
+def export_metric_loop(sm: str):
     while True:
-        logging.info("-- taking an exporter iteration")
-
-        threads = []
-        for sm in ["mac", "rlc", "pdcp"]:  
-            t = threading.Thread(target=push_metrics, args=(sm,))
-            t.start()
-            threads.append(t)
-
-        for thread in threads:
-            thread.join()
-
-            
+        logging.info(f"-- taking an exporter iteration for {sm}")
+        push_metrics(sm)
         time.sleep(EXPORTER_UPDATE_PERIOD)
+
+
+def run_kpi_monitoring_exporter():
+    prom.start_http_server(EXPORTER_PORT)
+    threading.Thread(target=export_metric_loop, args=("mac", )).start()
+    threading.Thread(target=export_metric_loop, args=("rlc", )).start()
+    threading.Thread(target=export_metric_loop, args=("pdcp", )).start()
+
+
+if __name__ == "__main__":
+    run_kpi_monitoring_exporter()
 

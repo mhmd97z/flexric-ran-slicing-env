@@ -1,12 +1,16 @@
-import prometheus_client as prom
+import threading
+import logging
+import time
 import requests
+import prometheus_client as prom
 import pandas as pd
-import json, logging, time
 from configs import PROMETHEUS_URL, SLICE_EXPORTER_PORT, EXPORTER_UPDATE_PERIOD, slice_stats_path
 from metrics import metrics_exporter, metrics_exporter_slice_mapping
 from utils import get_imsi_slice
 
+
 logging.basicConfig(level=logging.INFO)
+
 
 # get rid of bloat
 prom.REGISTRY.unregister(prom.PROCESS_COLLECTOR)
@@ -44,7 +48,8 @@ def get_imsi_slice_df():
     get_imsi_slice_mapping = get_imsi_slice()
     return pd.DataFrame(get_imsi_slice_mapping.items(), columns=['imsi', 'slice_id'])
 
-def exporter(df):
+
+def push_slice_metrics(df):
     metrics_labels = list(df.columns)
     metrics_labels.remove('slice_id')
     for _, row in df.iterrows():
@@ -52,7 +57,8 @@ def exporter(df):
             metrics_exporter['slice'][metrics_exporter_slice_mapping[metric_label]]\
                 .labels(slice_id= int(row['slice_id'])).set(float(row[metric_label]))
 
-def run_kpi_computation():
+
+def run_slice_computation():
     kpi_df = send_query()
     imsi_slice_df = get_imsi_slice_df()
 
@@ -66,20 +72,22 @@ def run_kpi_computation():
             slice_active_users= ('wb_cqi', 'count')
         ).reset_index()
         
-        print(agg_df)
-
-        print(slice_stats_path)
         agg_df.to_csv(slice_stats_path, index=False, encoding='utf-8')
+        push_slice_metrics(agg_df)
 
-        exporter(agg_df)
 
-if __name__ == "__main__":
-    prom.start_http_server(SLICE_EXPORTER_PORT)
-    logging.info("server is up")
-    logging.info("EXPORTER_UPDATE_PERIOD: {}".format(EXPORTER_UPDATE_PERIOD))
-    
+def slice_computation_loop():
     while True:
         logging.info("-- taking an exporter iteration")
-        run_kpi_computation()
-            
+        run_slice_computation()
         time.sleep(EXPORTER_UPDATE_PERIOD)
+
+
+def run_slice_exporter():
+    prom.start_http_server(SLICE_EXPORTER_PORT)
+    threading.Thread(target=slice_computation_loop).start()
+
+
+if __name__ == "__main__":
+    run_slice_exporter()
+

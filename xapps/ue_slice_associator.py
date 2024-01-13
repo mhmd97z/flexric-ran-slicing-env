@@ -1,8 +1,15 @@
-import time, json, sys, logging, sys
+import time
+import sys
+import logging
+import sys
 from configs import ASSOCIATOR_UPDATE_PERIOD
 from utils import get_imsi, get_imsi_slice, get_ue_slice_indication, ue_slice_associator
-logging.getLogger().setLevel(logging.INFO)
 import xapp_sdk as ric
+
+
+
+logging.basicConfig(level=logging.INFO)
+
 
 def runner(ric, conn):
     logging.info("rnti-slice mapping investigation")
@@ -33,6 +40,7 @@ if __name__ == "__main__":
         try:
             runner(ric, conn)
             time.sleep(ASSOCIATOR_UPDATE_PERIOD)
-        except:
-            print("runner error")
+        except Exception as e:
+            logging.exception(e)
             sys.exit()
+

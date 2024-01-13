@@ -5,7 +5,7 @@ from slice_ctrl_utils import fill_slice_scheme_ctrl_msg, fill_ue_slice_associati
 ###################
 ## rnti-imsi
 ###################
-def get_imsi(rnti, tolerant=True):
+def get_imsi(rnti, tolerant=False):
     rnti = str(rnti)
     try:
         f = open(rnti_imsi_path, 'r')
@@ -15,7 +15,7 @@ def get_imsi(rnti, tolerant=True):
         print("skipping ...")
         return None
 
-    if tolerant:
+    if not tolerant:
         cntr = 0
         while not rnti in rnti_imsi:
             time.sleep(0.2)
@@ -94,14 +94,8 @@ def get_slicing_scheme():
 
 
 def get_ue_slice_indication():
-    try:
-        f = open(slice_indication_path, 'r')
-        slice_indication_mapping = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
-        return None
-    
+    f = open(slice_indication_path, 'r')
+    slice_indication_mapping = json.load(f)
     return slice_indication_mapping['UE']
 
 

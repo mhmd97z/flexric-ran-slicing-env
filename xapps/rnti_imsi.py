@@ -14,21 +14,19 @@ wait = True
 
 
 def dump_mapping():
-    logging.debug("dump_mapping is invoked")
-    print('rnti_imsi_dict: ', rnti_imsi)
+    logging.info('rnti_imsi_dict: ', rnti_imsi)
     rnti_imsi_json = json.dumps(rnti_imsi)
     with open(rnti_imsi_path, "w") as outfile:
         outfile.write(rnti_imsi_json)
     
 
 def build_rnti_imsi_mapping():
-    logging.debug("build_rnti_imsi_mapping is invoked")
     global rnti_imsi
     rnti_imsi = {}
     for rnti, teid in rnti_teid.items():
         while not teid in teid_imsi:
             time.sleep(TEID_IMSI_UPDATE_PERIOD * 3)
-            print(f"teid_imsi_dict not up to date for {teid}")
+            logging.error(f"teid_imsi_dict not up to date for {teid}")
         rnti_imsi[rnti] = teid_imsi[teid]
     dump_mapping()
 
@@ -64,7 +62,7 @@ class RntiTeid(threading.Thread):
                 new_rnti = line_items[2].strip()
                 rnti_teid[new_rnti]= teid            
             else:
-                logging.info("rnti:{} was not found!".format(old_rnti))
+                logging.error("rnti:{} was not found!".format(old_rnti))
 
         elif command == RntiTeid.REMOVE_TUNNEL:
             rnti = line_items[1].strip()
@@ -73,7 +71,7 @@ class RntiTeid(threading.Thread):
         elif command == RntiTeid.REMOVE_RNTI:
             pass
         else:
-            logging.warning("skipping the line: {}".format(line))
+            logging.warning(f"skipping the line: {line}")
 
     def read_remaining_lines(self, file):
         updated = False
@@ -145,11 +143,15 @@ class TeidImsi(threading.Thread):
             time.sleep(TEID_IMSI_UPDATE_PERIOD)
 
 
-if __name__ == '__main__':
+def run_rnti_imsi_mapper():
     TeidImsi().start()
 
     while wait:
         time.sleep(0.1)
 
     RntiTeid().start()
+
+
+if __name__ == '__main__':
+    run_rnti_imsi_mapper()
 
