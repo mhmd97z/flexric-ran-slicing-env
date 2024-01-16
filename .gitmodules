@@ -1,0 +1,3 @@
+[submodule "srsRAN"]
+	path = srsRAN
+	url = ./srsRAN
