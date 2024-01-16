@@ -1,6 +1,7 @@
 [submodule "srsRAN"]
 	path = srsRAN
 	url = https://github.com/penhauer/srsRAN_4G.git
+	branch = ourrr_patchhh
 
 [submodule "flexric"]
 	path = flexric
