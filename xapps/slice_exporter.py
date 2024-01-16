@@ -1,4 +1,4 @@
-import threading
+
 import logging
 import time
 import requests
@@ -13,9 +13,9 @@ logging.basicConfig(level=logging.INFO)
 
 
 # get rid of bloat
-prom.REGISTRY.unregister(prom.PROCESS_COLLECTOR)
-prom.REGISTRY.unregister(prom.PLATFORM_COLLECTOR)
-prom.REGISTRY.unregister(prom.GC_COLLECTOR)
+# prom.REGISTRY.unregister(prom.PROCESS_COLLECTOR)
+# prom.REGISTRY.unregister(prom.PLATFORM_COLLECTOR)
+# prom.REGISTRY.unregister(prom.GC_COLLECTOR)
 requests.packages.urllib3.disable_warnings(
     requests.packages.urllib3.exceptions.InsecureRequestWarning
 )

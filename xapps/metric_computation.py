@@ -4,13 +4,17 @@ from monitoring_exporter import run_kpi_monitoring_exporter
 from slice_exporter import run_slice_exporter
 
 
+class Object(object):
+    pass
+
+
 def main():
     run_rnti_imsi_mapper()
 
-    args = object()
-    args.__setattr__("all", True)
-    args.__setattr__("kpi", False)
-    args.__setattr__("slice", False)
+    args = Object()
+    setattr(args, "all", True)
+    setattr(args, "kpi", False)
+    setattr(args, "slice", False)
     run_exposer(args)
 
     run_kpi_monitoring_exporter()
