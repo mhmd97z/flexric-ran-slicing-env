@@ -1,3 +1,11 @@
 [submodule "srsRAN"]
 	path = srsRAN
 	url = ./srsRAN
+
+[submodule "flexric"]
+	path = flexric
+	url = ./flexric
+
+[submodule "flexric_backup"]
+	path = flexric_backup
+	url = ./flexric_backup/
