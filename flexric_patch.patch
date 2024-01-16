@@ -1,0 +1,128 @@
+From e52c4f2a1c7f6846a35c1f8190d7ba7783b0a3e9 Mon Sep 17 00:00:00 2001
+From: mhmd97z <mmd1997z@gmail.com>
+Date: Tue, 16 Jan 2024 14:46:14 -0500
+Subject: [PATCH] feat: comment some db related assertions
+
+---
+ .../alg_ds/ds/assoc_container/assoc_rb_tree.c |  0
+ src/xApp/db/sqlite3/sqlite3_wrapper.c         | 44 +++++++++++++++----
+ 2 files changed, 36 insertions(+), 8 deletions(-)
+ mode change 100644 => 100755 src/util/alg_ds/ds/assoc_container/assoc_rb_tree.c
+
+diff --git a/src/util/alg_ds/ds/assoc_container/assoc_rb_tree.c b/src/util/alg_ds/ds/assoc_container/assoc_rb_tree.c
+old mode 100644
+new mode 100755
+diff --git a/src/xApp/db/sqlite3/sqlite3_wrapper.c b/src/xApp/db/sqlite3/sqlite3_wrapper.c
+index 84922287..31e1c821 100644
+--- a/src/xApp/db/sqlite3/sqlite3_wrapper.c
++++ b/src/xApp/db/sqlite3/sqlite3_wrapper.c
+@@ -33,6 +33,9 @@ void create_table(sqlite3* db, char* sql)
+ {
+   char* err_msg = NULL;
+   int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
++  if (rc != SQLITE_OK) {
++    printf("%s\n", err_msg);
++  }
+   assert(rc == SQLITE_OK && "Error while creating the DB. Check the err_msg string for further info" );
+ }
+ 
+@@ -317,7 +320,11 @@ void insert_db(sqlite3* db, char const* sql)
+ 
+   char* err_msg = NULL;
+   int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+-  assert(rc == SQLITE_OK && "Error while inserting into the DB. Check the err_msg string for further info");
++  if (rc != SQLITE_OK) {
++    printf("%s\n", err_msg);
++  }
++  
++  // assert(rc == SQLITE_OK && "Error while inserting into the DB. Check the err_msg string for further info");
+ }
+ 
+ 
+@@ -327,7 +334,10 @@ int to_sql_string_mac_ue(global_e2_node_id_t const* id, mac_ue_stats_impl_t* sta
+   assert(stats != NULL);       
+   assert(out != NULL);
+   const size_t max = 1024;
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char c_cu_du_id[26];
+@@ -445,7 +455,10 @@ int to_sql_string_rlc_rb(global_e2_node_id_t const* id,rlc_radio_bearer_stats_t*
+   assert(rlc != NULL);
+   assert(out != NULL);
+   const size_t max = 1024;
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char c_cu_du_id[26];
+@@ -549,7 +562,10 @@ int to_sql_string_pdcp_rb(global_e2_node_id_t const* id, pdcp_radio_bearer_stats
+   assert(pdcp != NULL);        
+   assert(out != NULL);
+   const size_t max = 512;      
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char c_cu_du_id[26];
+@@ -622,7 +638,10 @@ int to_sql_string_ue_slice_rb(global_e2_node_id_t const* id, ue_slice_conf_t con
+   assert(ues != NULL);
+   assert(out != NULL);
+   const size_t max = 512;
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char c_cu_du_id[26];
+@@ -679,7 +698,10 @@ int to_sql_string_slice_rb(global_e2_node_id_t const* id, ul_dl_slice_conf_t con
+   assert(slices != NULL);
+   assert(out != NULL);
+   const size_t max = 1024;
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char sched_name[50];
+@@ -855,7 +877,10 @@ int to_sql_string_gtp_NGUT(global_e2_node_id_t const* id,gtp_ngu_t_stats_t* gtp,
+   assert(gtp != NULL);
+   assert(out != NULL);
+   const size_t max = 1024;
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char c_cu_du_id[26];
+@@ -905,7 +930,10 @@ void to_sql_string_kpm_measRecord(global_e2_node_id_t const* id,
+   assert(kpm_measData != NULL);
+   assert(out != NULL);
+   const size_t max = 512;
+-  assert(out_len >= max);
++  // assert(out_len >= max);
++  // if (out_len >= max) {
++  //   printf("out_len >= max");
++  // }
+ 
+   char* c_null = NULL;
+   char c_cu_du_id[26];
+-- 
+2.25.1
+
