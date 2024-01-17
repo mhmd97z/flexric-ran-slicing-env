@@ -1,6 +1,9 @@
+import logging
 import json, time, configparser
 from configs import rnti_imsi_path, imsi_slice_path, slice_indication_path, slicing_scheme_path, srsran_config_path
 from slice_ctrl_utils import fill_slice_scheme_ctrl_msg, fill_ue_slice_association_ctrl_msg
+import xapp_sdk as ric
+from threading import Lock
 
 ###################
 ## rnti-imsi
@@ -10,9 +13,9 @@ def get_imsi(rnti, tolerant=False):
     try:
         f = open(rnti_imsi_path, 'r')
         rnti_imsi = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
+        f.close()
+    except Exception as e:
+        logging.exception(e)
         return None
 
     if not tolerant:
@@ -22,9 +25,9 @@ def get_imsi(rnti, tolerant=False):
             try: 
                 f = open(rnti_imsi_path, 'r')
                 rnti_imsi = json.load(f)
-            except:
-                print("rnti_imsi json file not found")
-                print("skipping ...")
+                f.close()
+            except Exception as e:
+                logging.exception(e)
                 return None
 
             cntr += 1
@@ -44,9 +47,9 @@ def get_rnti(imsi):
     try:
         f = open(rnti_imsi_path, 'r')
         rnti_imsi = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
+        f.close()
+    except Exception as e:
+        logging.exception(e)
         return None
 
     rntis = [k for k, v in rnti_imsi.items() if v == imsi]
@@ -73,9 +76,9 @@ def get_imsi_slice():
     try: 
         f = open(imsi_slice_path, 'r')
         imsi_slice_mapping = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
+        f.close()
+    except Exception as e:
+        logging.exception(e)
         return {}
     
     return imsi_slice_mapping
@@ -85,9 +88,9 @@ def get_slicing_scheme():
     try:
         f = open(slicing_scheme_path, 'r')
         slicing_scheme = json.load(f)
-    except:
-        print("rnti_imsi json file not found")
-        print("skipping ...")
+        f.close()
+    except Exception as e:
+        logging.exception(e)
         return None
 
     return slicing_scheme
@@ -96,18 +99,15 @@ def get_slicing_scheme():
 def get_ue_slice_indication():
     f = open(slice_indication_path, 'r')
     slice_indication_mapping = json.load(f)
+    f.close()
     return slice_indication_mapping['UE']
 
 
-def set_slice(decision=None, reset=False, ric_=None, conn=None):
-    if ric_ == None:
-        import xapp_sdk as ric
-        ric.init()
+def set_slice(decision=None, reset=False, conn=None):
+    if conn is None:
+        init_ric_wrapper()
         conn = ric.conn_e2_nodes()
         assert(len(conn) > 0)
-        node_idx = 0
-    else:
-        ric = ric_
 
     if reset:
         slicing_scheme = {"num_slices" : 0}
@@ -122,17 +122,29 @@ def set_slice(decision=None, reset=False, ric_=None, conn=None):
                 base += prb - 1
             print("slicing scheme: ", slicing_scheme)
 
-    msg = fill_slice_scheme_ctrl_msg(ric, slicing_scheme)
+    msg = fill_slice_scheme_ctrl_msg(slicing_scheme)
     ric.control_slice_sm(conn[0].id, msg)
 
-    # Avoid deadlock. ToDo revise architecture 
-    if ric_ == None:
-        while ric.try_stop == 0:
-            time.sleep(1)
     
 
-def ue_slice_associator(ric, conn, item):
+def ue_slice_associator(conn, item):
     node_idx = 0
-    msg = fill_ue_slice_association_ctrl_msg(ric, item)
+    msg = fill_ue_slice_association_ctrl_msg(item)
     ric.control_slice_sm(conn[node_idx].id, msg)
+
+
+
+class RicInitiator():
+    initiated = False
+    intitiation_lock = Lock()
+
+    @staticmethod
+    def init_ric_wrapper():
+        with RicInitiator.intitiation_lock:
+            if not RicInitiator.initiated:
+                ric.init()
+                RicInitiator.initiated = True
+
+def init_ric_wrapper():
+    RicInitiator.init_ric_wrapper()
 

@@ -20,10 +20,10 @@ def push_metrics(sm: str):
     try:
         f = open(metrics_path[sm], 'r')
         data = json.load(f)
+        f.close()
         rntis = list(data.keys())
-    except:
-        logging.info("{} metrics json file not found".format(sm))
-        logging.info("skipping ...")
+    except Exception as e:
+        logging.exception(e)
         return
 
     if len(rntis) == 0:
@@ -38,8 +38,6 @@ def push_metrics(sm: str):
                 value = data[rnti][sm][metrics_keys[iter_]]
                 metric.labels(imsi=imsi).set(value)
             logging.info("{} metrics are pushed for imsi {}".format(sm, imsi))
-        else:
-            logging.info("no imsi was found for rnti {}".format(rnti))
 
 
 def export_metric_loop(sm: str):

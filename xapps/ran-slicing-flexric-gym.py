@@ -1,7 +1,8 @@
-import json, time, gym
+import time, gym
 import pandas as pd
 from configs import slice_stats_path
-from utils import get_prb_count, set_slice, get_slicing_scheme
+from utils import get_prb_count, set_slice, get_slicing_scheme, init_ric_wrapper
+
 from metrics import metrics_exporter_slice_mapping as slice_metrics
 import xapp_sdk as ric
 
@@ -23,9 +24,8 @@ class RanSlicingFlexricGym(gym.Env):
                                             shape=(self.metrics_count * self.slice_count,), dtype=float)
         
         # setup ric
-        ric.init()
-        self.ric = ric
-        self.conn = self.ric.conn_e2_nodes()
+        init_ric_wrapper()
+        self.conn = ric.conn_e2_nodes()
         
         self.reset()
 
@@ -77,7 +77,7 @@ class RanSlicingFlexricGym(gym.Env):
         for iter, slice_id in enumerate(self.slice_ids):
             action_dict[slice_id] = action[iter]
             
-        set_slice(decision=action_dict, ric_=self.ric, conn=self.conn)
+        set_slice(decision=action_dict, conn=self.conn)
 
 
     def step(self, action):

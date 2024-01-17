@@ -32,7 +32,7 @@ srsran_config_path = "/root/.config/srsran"
 rnti_teid_path = get_rnti_teid_path()   # /tmp/tunnel_rnti.txt
 imsi_teid_path = get_imsi_teid_path()   # /tmp/imsi_teid.txt
 
-BASE = "/home/mzi/ran-slicing-flexric-gym/"
+BASE = "/home/amirmo/ran-slicing-flexric-gym/"
 
 # metrics
 metrics_path = {"mac": BASE + "xapps/stats/exporter_stats_mac.json",
@@ -50,4 +50,4 @@ slice_stats_path = BASE + "/xapps/stats/exporter_stats_slice.csv"
 
 
 # rnti-imsi
-rnti_imsi_path = BASE + "xapps/rnti_imsi.json"
+rnti_imsi_path = BASE + "/xapps/rnti_imsi.json"

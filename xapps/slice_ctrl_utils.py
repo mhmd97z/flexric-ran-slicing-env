@@ -1,4 +1,6 @@
-def fill_ue_slice_association_ctrl_msg(ric, items):
+import xapp_sdk as ric
+
+def fill_ue_slice_association_ctrl_msg(items):
     msg = ric.slice_ctrl_msg_t()
     msg.type = ric.SLICE_CTRL_SM_V0_UE_SLICE_ASSOC
     msg.u.ue_slice.len_ue_slice = len(items)
@@ -11,7 +13,7 @@ def fill_ue_slice_association_ctrl_msg(ric, items):
     msg.u.ue_slice.ues = assoc
     return msg
 
-def create_slice(ric, slice_params, slice_sched_algo):
+def create_slice(slice_params, slice_sched_algo):
     s = ric.fr_slice_t()
     s.id = slice_params["id"]
     s.label = slice_params["label"]
@@ -51,7 +53,7 @@ def create_slice(ric, slice_params, slice_sched_algo):
     return s
 
 
-def fill_slice_scheme_ctrl_msg(ric, ctrl_msg):
+def fill_slice_scheme_ctrl_msg(ctrl_msg):
     msg = ric.slice_ctrl_msg_t()
     msg.type = ric.SLICE_CTRL_SM_V0_ADD
     dl = ric.ul_dl_slice_conf_t()
@@ -66,7 +68,7 @@ def fill_slice_scheme_ctrl_msg(ric, ctrl_msg):
     dl.len_slices = ctrl_msg["num_slices"]
     slices = ric.slice_array(ctrl_msg["num_slices"])
     for i in range(0, ctrl_msg["num_slices"]):
-        slices[i] = create_slice(ric, ctrl_msg["slices"][i], ctrl_msg["slice_sched_algo"])
+        slices[i] = create_slice(ctrl_msg["slices"][i], ctrl_msg["slice_sched_algo"])
 
     dl.slices = slices
     msg.u.add_mod_slice.dl = dl

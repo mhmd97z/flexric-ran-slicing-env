@@ -7,6 +7,7 @@ import threading
 from collections import defaultdict
 from configs import metrics_path, slice_indication_path
 from metrics import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list
+from utils import init_ric_wrapper
 import xapp_sdk as ric
 
 logging.basicConfig(level=logging.DEBUG)
@@ -202,7 +203,7 @@ def run_exposer_loop(args):
     pdcp_hndlr = []
     slice_hndlr = []
 
-    ric.init()
+    init_ric_wrapper()
     conn = ric.conn_e2_nodes()
     assert(len(conn) > 0)
     for i in range(0, len(conn)):
