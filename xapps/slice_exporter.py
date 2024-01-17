@@ -2,6 +2,7 @@
 import logging
 import time
 import requests
+import threading
 import prometheus_client as prom
 import pandas as pd
 from configs import PROMETHEUS_URL, SLICE_EXPORTER_PORT, EXPORTER_UPDATE_PERIOD, slice_stats_path
