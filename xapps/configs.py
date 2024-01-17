@@ -32,21 +32,22 @@ srsran_config_path = "/root/.config/srsran"
 rnti_teid_path = get_rnti_teid_path()   # /tmp/tunnel_rnti.txt
 imsi_teid_path = get_imsi_teid_path()   # /tmp/imsi_teid.txt
 
+BASE = "/home/mzi/ran-slicing-flexric-gym/"
 
 # metrics
-metrics_path = {"mac": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_mac.json",
-                "rlc": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_rlc.json",
-                "pdcp": "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_pdcp.json"}
+metrics_path = {"mac": BASE + "xapps/stats/exporter_stats_mac.json",
+                "rlc": BASE + "xapps/stats/exporter_stats_rlc.json",
+                "pdcp": BASE + "xapps/stats/exporter_stats_pdcp.json"}
 
 # slicing config
-imsi_slice_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/imsi_slice_mapping_dict.json"
-slicing_scheme_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/slicing_scheme.json"
+imsi_slice_path = BASE + "xapps/imsi_slice_mapping_dict.json"
+slicing_scheme_path = BASE + "xapps/slicing_scheme.json"
 
 
 # slicing indication
-slice_indication_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_indication_slice.json"
-slice_stats_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/exporter_stats_slice.csv"
+slice_indication_path = BASE + "/xapps/stats/exporter_indication_slice.json"
+slice_stats_path = BASE + "/xapps/stats/exporter_stats_slice.csv"
 
 
 # rnti-imsi
-rnti_imsi_path = "/home/mzi/ran-slicing-flexric-gym/flexric/build/examples/xApp/python3/stats/rnti_imsi.json"
+rnti_imsi_path = BASE + "xapps/rnti_imsi.json"
