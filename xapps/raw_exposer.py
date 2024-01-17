@@ -296,7 +296,7 @@ def run_exposer():
     setattr(args, "all", True)
     setattr(args, "kpi", False)
     setattr(args, "slice", False)
-    threading.Thread(target=run_exposer_loop, args=("mac", )).start()
+    threading.Thread(target=run_exposer_loop, args=(args, )).start()
 
 if __name__ == "__main__":
     args = build_parser()

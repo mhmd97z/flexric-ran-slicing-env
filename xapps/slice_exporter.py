@@ -1,4 +1,3 @@
-
 import logging
 import time
 import requests
@@ -28,21 +27,18 @@ def send_query():
     for metric in kpis_label:
         r = requests.get(url=PROMETHEUS_URL + '/api/v1/query', params={'query': metric})
         data = r.json()
-        if data['status'] == 'success':
+        if data['status'] == 'success' and len(data['data']['result']) > 0:
             for item in data['data']['result']:
                 if not item['metric']['imsi'] in data_list:
                     data_list[item['metric']['imsi']] = []
                 data_list[item['metric']['imsi']].append(float(item['value'][1]))
+        else:
+            return None
 
     data = []
     for imsi, kpis in data_list.items():
         data.append([imsi] + kpis)
-    print("data: ", data)
-    if len(data) > 0:
-        return pd.DataFrame(data, columns=['imsi'] + kpis_label)
-
-    else:
-        return None
+    return pd.DataFrame(data, columns=['imsi'] + kpis_label)
 
 
 def get_imsi_slice_df():
@@ -79,7 +75,7 @@ def run_slice_computation():
 
 def slice_computation_loop():
     while True:
-        logging.info("-- taking an exporter iteration")
+        logging.info("-- taking an exporter iteration for slice")
         run_slice_computation()
         time.sleep(EXPORTER_UPDATE_PERIOD)
 
