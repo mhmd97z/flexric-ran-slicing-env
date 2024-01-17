@@ -14,11 +14,11 @@ wait = True
 
 
 def dump_mapping():
-    logging.info('rnti_imsi_dict: ', rnti_imsi)
+    logging.info("rnti_imsi_dict %s", rnti_imsi)
     rnti_imsi_json = json.dumps(rnti_imsi)
     with open(rnti_imsi_path, "w") as outfile:
         outfile.write(rnti_imsi_json)
-    
+
 
 def build_rnti_imsi_mapping():
     global rnti_imsi
@@ -26,7 +26,7 @@ def build_rnti_imsi_mapping():
     for rnti, teid in rnti_teid.items():
         while not teid in teid_imsi:
             time.sleep(TEID_IMSI_UPDATE_PERIOD * 3)
-            logging.error(f"teid_imsi_dict not up to date for {teid}")
+            logging.error("teid_imsi_dict not up to date for %s", teid)
         rnti_imsi[rnti] = teid_imsi[teid]
     dump_mapping()
 
@@ -71,7 +71,7 @@ class RntiTeid(threading.Thread):
         elif command == RntiTeid.REMOVE_RNTI:
             pass
         else:
-            logging.warning(f"skipping the line: {line}")
+            logging.warning("skipping the line %s", line)
 
     def read_remaining_lines(self, file):
         updated = False

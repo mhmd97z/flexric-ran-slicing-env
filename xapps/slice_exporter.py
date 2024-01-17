@@ -37,7 +37,7 @@ def send_query():
     data = []
     for imsi, kpis in data_list.items():
         data.append([imsi] + kpis)
-
+    print("data: ", data)
     if len(data) > 0:
         return pd.DataFrame(data, columns=['imsi'] + kpis_label)
 
