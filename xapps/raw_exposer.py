@@ -3,6 +3,7 @@ import time
 import json
 import logging 
 import argparse
+import threading
 from collections import defaultdict
 from configs import metrics_path, slice_indication_path
 from metrics import mac_kpi_list, rlc_kpi_list, pdcp_kpi_list
@@ -191,7 +192,7 @@ class SLICECallback(ric.slice_cb):
 
 
 
-def run_exposer(args):
+def run_exposer_loop(args):
     if not (args.all or args.kpi or args.slice):
         print("Are you serious?!")
         sys.exit(1)
@@ -286,8 +287,17 @@ def build_parser():
     args = parser.parse_args() 
     return args
 
+def run_exposer():
+
+    class Object(object):
+        pass
+
+    args = Object()
+    setattr(args, "all", True)
+    setattr(args, "kpi", False)
+    setattr(args, "slice", False)
+    threading.Thread(target=run_exposer_loop, args=("mac", )).start()
 
 if __name__ == "__main__":
     args = build_parser()
-    run_exposer(args)
-
+    run_exposer_loop(args)
