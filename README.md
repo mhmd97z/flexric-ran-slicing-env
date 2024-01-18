@@ -7,7 +7,7 @@ We introduce **flexric-ran-slicing-env** to facilitate the RL agent's interactio
 ### flexric-ran-slicing-env
 ```bash
 git clone git@github.com:mhmd97z/ran-slicing-flexric-gym.git
-# install the required python
+# install the required python packages
 pip3 install -r requirements.txt
 ```
 
