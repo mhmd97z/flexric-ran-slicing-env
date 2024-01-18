@@ -1,6 +1,7 @@
 DESCRIPTION OF THE ENV
 
-![ran-slicing-flexric-env](https://github.com/mhmd97z/ran-slicing-flexric-gym/assets/38925299/4496a75c-377b-4a5f-911f-b3bb0ddc1097)
+![ran-slicing-flexric-env](https://github.com/mhmd97z/ran-slicing-flexric-gym/assets/38925299/8e3b7b90-77fb-400f-a40c-77afd1dcb48b)
+
 
 # Installation
 ## 
