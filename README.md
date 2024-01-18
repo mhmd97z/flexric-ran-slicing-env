@@ -50,14 +50,17 @@ cd flexric
 git am path-to-flexric-ran-slicing-env/flexric_patch.patch --whitespace=nowarnapply patch
 
 # build the project
-# install the necessary requirements according to the instructions of the origial repo
+# install the requirements according to the instructions of the original repo
+mkdir build && cd build
+cmake ..
+make
 
 ```
 
 ### UEs
 1. root the phone
-2. install ``SSH Server.apk'' on the phone
-3. add a user to the ``SSH Server.apk''
+2. install **SSH Server.apk** on the phone
+3. add a user to the **SSH Server.apk**
 4. copy a precompiled iperf binary to the phone using [this repo](https://github.com/KnightWhoSayNi/android-iperf)
 
 # Example Usage
