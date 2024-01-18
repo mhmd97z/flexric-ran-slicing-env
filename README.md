@@ -1,4 +1,4 @@
-DESCRIPTION OF THE ENV
+We introduce **flexric-ran-slicing-env** to facilitate the RL agent's interaction with the RAN slicing infrastructure. This environment provides state variables to the RL agent and receives the agent's decision regarding the distribution of resources among slices. Moreover, this environment provides the means to set the experiment scenario regarding the number of slices, the associated UEs, and the traffic generation timings.
 
 ![ran-slicing-flexric-env](https://github.com/mhmd97z/ran-slicing-flexric-gym/assets/38925299/7697997b-c4cc-4a14-a68c-678f6e828290)
 
