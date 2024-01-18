@@ -54,7 +54,7 @@ git am path-to-flexric-ran-slicing-env/flexric_patch.patch --whitespace=nowarnap
 
 ```
 
-### ue ssh setup
+### UEs
 1. root the phone
 2. install ``SSH Server.apk'' on the phone
 3. add a user to the ``SSH Server.apk''
