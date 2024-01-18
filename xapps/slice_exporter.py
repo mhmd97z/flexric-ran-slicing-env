@@ -1,4 +1,5 @@
 import logging
+import sys
 import time
 import requests
 import threading
@@ -77,7 +78,11 @@ def run_slice_computation():
 def slice_computation_loop():
     while True:
         logging.info("-- taking an exporter iteration for slice")
-        run_slice_computation()
+        try:
+            run_slice_computation()
+        except Exception as e:
+            logging.exception(e)
+            sys.exit(1)
         time.sleep(EXPORTER_UPDATE_PERIOD)
 
 

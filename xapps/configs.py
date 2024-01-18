@@ -51,3 +51,6 @@ slice_stats_path = BASE + "/xapps/stats/exporter_stats_slice.csv"
 
 # rnti-imsi
 rnti_imsi_path = BASE + "/xapps/rnti_imsi.json"
+
+# phones
+phones_json_path = "/tmp/phones.json"

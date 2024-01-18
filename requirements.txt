@@ -3,3 +3,4 @@ pandas
 prometheus_client
 requests
 gym
+jsonpickle

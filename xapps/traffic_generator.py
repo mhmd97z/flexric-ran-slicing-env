@@ -3,6 +3,8 @@ import subprocess
 import threading
 import time
 from paramiko_expect import SSHClientInteraction
+import jsonpickle
+from configs import phones_json_path
 
 
 
@@ -18,21 +20,46 @@ class Phone():
         self.iperf_binary = iperf_binary
 
 
-a_phone = Phone(
-    control_plane_ip="192.168.1.162", port=2222,
-    username="ue90", password="ue90", 
-    iperf_binary="/data/local/tmp/binaries/libs/arm64-v8a/iperf3.8",
-    data_plane_ip="172.16.0.10", 
-)
-a_phone.data_plane_ip = a_phone.control_plane_ip
-
-PHONES = [
-    a_phone,
-]
+class IperfTrafficInterval:
+    def __init__(self, *, length: int, bitrate) -> None:
+        self.length = length
+        self.bitrate = bitrate
 
 
-def run_iperf_from_client(phone):
-    subprocess.run(["iperf3", "-c", phone.data_plane_ip])
+class TrafficPattern:
+    def __init__(self) -> None:
+        self.intervals = []
+
+    def add_interval(self, *, start, traffic_interval):
+        self.intervals.append((start, traffic_interval))
+        return self
+
+
+class TrafficPatternExecutor:
+    def run(self, phone: Phone, traffic_pattern: TrafficPattern):
+        t = 0
+        PERIOD = 0.05
+        ind = 0
+        while True:
+            if ind < len(traffic_pattern.intervals):
+                start, tp = traffic_pattern.intervals[ind]
+                if start < t:
+                    print("starting at ", ind, t)
+                    threading.Thread(target=run_iperf_from_client, args=(phone, tp)).start()
+                    ind += 1
+            else:
+                return
+                
+            time.sleep(PERIOD)
+            t += PERIOD
+
+
+
+def run_iperf_from_client(phone: Phone, iti: IperfTrafficInterval):
+    bitrate_cmd_str = ""
+    if iti.bitrate is not None:
+        bitrate_cmd_str = f"-b {iti.bitrate}"
+    subprocess.run(["iperf3", "-c", phone.data_plane_ip, "-t", str(iti.length), bitrate_cmd_str])
 
 
 def setup_iperf_server_on_phone(phone):
@@ -87,16 +114,27 @@ def setup_iperf_servers(phones):
 
 
 
-def generate_traffic(phones):
+def generate_traffic(phones, traffics):
     setup_iperf_servers(phones)
-    threading.Thread(target=generate_intermittent_traffic, args=(phones,)).start()
+    time.sleep(20)
+    for phone, traffic_pattern in zip(phones, traffics):
+        TrafficPatternExecutor().run(phone, traffic_pattern)
 
 
-def generate_intermittent_traffic(phones):
-    while True:
-        time.sleep(30)
-        for phone in phones:
-            threading.Thread(target=run_iperf_from_client, args=(phone,)).start()
+def load_phones():
+    f = open(phones_json_path, "r")
+    phones_json_str = '\n'.join(f.readlines())
+    phones = jsonpickle.decode(phones_json_str)
+    return phones
 
 
-generate_traffic(PHONES)
+phones = load_phones()
+
+tp0 = TrafficPattern()\
+        .add_interval(start=3, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))\
+        .add_interval(start=10, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))\
+        .add_interval(start=15, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))
+
+a = [tp0]
+generate_traffic(phones, a)
+

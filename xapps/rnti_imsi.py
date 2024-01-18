@@ -1,3 +1,5 @@
+import logging
+import sys
 import time
 import json
 import threading
@@ -91,7 +93,7 @@ class RntiTeid(threading.Thread):
                 updated = True
                 self.update_rnti_teid_dict(line)
     
-    def run(self):
+    def do_run(self):
         # iterate through the existing lines
         rnti_teid = open(rnti_teid_path, "r")
         self.read_remaining_lines(rnti_teid)
@@ -105,6 +107,13 @@ class RntiTeid(threading.Thread):
             if updated:
                 build_rnti_imsi_mapping()
             time.sleep(RNTI_TEID_UPDATE_PERIOD)
+
+    def run(self):
+        try:
+            self.do_run()
+        except Exception as e:
+            logging.exception(e)
+            sys.exit(1)
 
 
 class TeidImsi(threading.Thread):
@@ -129,7 +138,7 @@ class TeidImsi(threading.Thread):
             if len(line.split(" ")) == 3:
                 self.update_teid_imsi_dict(line)
 
-    def run(self):
+    def do_run(self):
         # iterate through the existing lines
         teid_imsi_file = open(imsi_teid_path, "r")
         self.read_remaining_lines(teid_imsi_file)
@@ -142,6 +151,13 @@ class TeidImsi(threading.Thread):
         while True:
             self.read_remaining_lines(teid_imsi_file)
             time.sleep(TEID_IMSI_UPDATE_PERIOD)
+
+    def run(self):
+        try:
+            self.do_run()
+        except Exception as e:
+            logging.exception(e)
+            sys.exit(1)
 
 
 def run_rnti_imsi_mapper():

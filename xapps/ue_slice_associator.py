@@ -1,4 +1,5 @@
 import time
+import os
 import sys
 import logging
 import threading
@@ -39,10 +40,9 @@ def ue_slice_associator_loop():
     while True:
         try:
             runner()
-            time.sleep(ASSOCIATOR_UPDATE_PERIOD)
         except Exception as e:
             logging.exception(e)
-            sys.exit()
+        time.sleep(ASSOCIATOR_UPDATE_PERIOD)
 
 
 def run_ue_slice_associator():

@@ -1,6 +1,8 @@
 import logging
 import threading
-import json, time
+import sys
+import json
+import time
 import prometheus_client as prom
 import sys
 from metrics import metrics_exporter as metrics
@@ -44,7 +46,12 @@ def push_metrics(sm: str):
 def export_metric_loop(sm: str):
     while True:
         logging.info(f"-- taking an exporter iteration for {sm}")
-        push_metrics(sm)
+        try:
+            push_metrics(sm)
+        except Exception as e:
+            logging.exception(e)
+            sys.exit(1)
+
         time.sleep(EXPORTER_UPDATE_PERIOD)
 
 

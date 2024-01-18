@@ -10,7 +10,7 @@ import xapp_sdk as ric
 class RanSlicingFlexricGym(gym.Env):
     def __init__(self):
         # get system configs
-        self.prb_count = int(get_prb_count() / 2) # based on flexric api, the action resolution is 2 prbs
+        self.prb_count = get_prb_count() // 2 # based on flexric api, the action resolution is 2 prbs
         self.metrics_count = len(slice_metrics)
         self.initial_slicing_scheme = get_slicing_scheme()
         self.slice_count = int(self.initial_slicing_scheme['num_slices'])

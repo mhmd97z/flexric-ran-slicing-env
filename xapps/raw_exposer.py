@@ -18,11 +18,7 @@ class MACCallback(ric.mac_cb):
         ric.mac_cb.__init__(self)
 
     def handle(self, ind):
-        logging.debug("mac handler is invoked")
-
         if len(ind.ue_stats) > 0:
-            logging.debug("mac handler found {} users".format(len(ind.ue_stats)))
-
             kpi_stats = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
             for _, item in enumerate(ind.ue_stats):
                 for kpi in mac_kpi_list: 
@@ -40,11 +36,7 @@ class RLCCallback(ric.rlc_cb):
     def __init__(self):
         ric.rlc_cb.__init__(self)
     def handle(self, ind):
-        logging.debug("rlc handler is invoked")
-
         if len(ind.rb_stats) > 0:
-            logging.debug("rlc handler found {} users".format(len(ind.rb_stats)))
-
             kpi_stats = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
             for _, item in enumerate(ind.rb_stats):
                 for kpi in rlc_kpi_list: 
@@ -63,11 +55,7 @@ class PDCPCallback(ric.pdcp_cb):
         ric.pdcp_cb.__init__(self)
 
     def handle(self, ind):
-        logging.debug("pdcp handler is invoked")
-
         if len(ind.rb_stats) > 0:
-            logging.debug("pdcp handler found {} users".format(len(ind.rb_stats)))
-
             kpi_stats = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
             for _, item in enumerate(ind.rb_stats):
                 for kpi in pdcp_kpi_list: 
@@ -88,7 +76,6 @@ class SLICECallback(ric.slice_cb):
         ric.slice_cb.__init__(self)
 
     def handle(self, ind):
-        logging.debug("slice handler is invoked")
         self.slice_ind_to_dict_json(ind)
 
     @staticmethod
