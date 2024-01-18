@@ -4,6 +4,7 @@ import threading
 import time
 from paramiko_expect import SSHClientInteraction
 import jsonpickle
+import numpy as np
 from configs import phones_json_path
 
 
@@ -128,13 +129,56 @@ def load_phones():
     return phones
 
 
-phones = load_phones()
+# phones = load_phones()
+#
+# tp0 = TrafficPattern()\
+#         .add_interval(start=3, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))\
+#         .add_interval(start=10, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))\
+#         .add_interval(start=15, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))
+#
+# a = [tp0]
+# # generate_traffic(phones, a)
 
-tp0 = TrafficPattern()\
-        .add_interval(start=3, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))\
-        .add_interval(start=10, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))\
-        .add_interval(start=15, traffic_interval=IperfTrafficInterval(length=3, bitrate=None))
 
-a = [tp0]
-generate_traffic(phones, a)
+def genZ(total_time: float, length: float, inter_arrival: float):
+    t = 0
+    starts = []
+    ends = []
+    points = []
+    while t < total_time:
+        ia = int(np.random.exponential(inter_arrival))
+        l = int(np.random.exponential(length))
+        t += ia
 
+        if t + l >= total_time:
+            l = total_time - t
+            break
+
+        points.append((t, "start"))
+        points.append((t + l, "end"))
+
+
+    # merge overlapping segements
+    points = sorted(points)
+    tp = TrafficPattern()
+    bitrate = 0
+    for i in range(len(points)):
+        if bitrate >= 1:
+            tp.add_interval(
+                    start=points[i - 1], 
+                    traffic_interval=IperfTrafficInterval(length=points[i] - points[i - 1], bitrate=bitrate)
+            )
+        if points[i][1] == "start":
+            bitrate += 1000000
+        else:
+            bitrate -= 1000000
+    return tp
+
+
+def run():
+    np.random.seed(123412)
+    phones = load_phones()
+    tps = [genZ(100, 3, 3) for phone in phones]
+    generate_traffic(phones, tps)
+
+run()
