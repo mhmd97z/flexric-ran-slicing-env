@@ -1,3 +1,5 @@
+import logging
+import sys
 import paramiko
 import subprocess
 import threading
@@ -8,6 +10,8 @@ import numpy as np
 from configs import phones_json_path
 
 
+
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 class Phone():
@@ -63,7 +67,8 @@ def run_iperf_from_client(phone: Phone, iti: IperfTrafficInterval):
     subprocess.run(["iperf3", "-c", phone.data_plane_ip, "-t", str(iti.length), bitrate_cmd_str])
 
 
-def setup_iperf_server_on_phone(phone):
+def setup_iperf_server_on_phone(phone: Phone):
+    logging.info("setting iperf server on phone %s ", phone.data_plane_ip)
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.connect(
@@ -75,7 +80,7 @@ def setup_iperf_server_on_phone(phone):
 
     PROMPT = r":/ #\s+"
     try:
-        with SSHClientInteraction(client, timeout=10, display=True) as interact:
+        with SSHClientInteraction(client, timeout=5, display=True) as interact:
             # get root access
             interact.send("su")
 
@@ -116,8 +121,7 @@ def setup_iperf_servers(phones):
 
 
 def generate_traffic(phones, traffics):
-    setup_iperf_servers(phones)
-    time.sleep(20)
+    time.sleep(10)
     for phone, traffic_pattern in zip(phones, traffics):
         TrafficPatternExecutor().run(phone, traffic_pattern)
 
@@ -141,21 +145,22 @@ def load_phones():
 
 
 def genZ(total_time: float, length: float, inter_arrival: float):
+    print("\n\n\n\n\n")
     t = 0
-    starts = []
-    ends = []
     points = []
     while t < total_time:
         ia = int(np.random.exponential(inter_arrival))
         l = int(np.random.exponential(length))
+        if ia <= 0 or l <= 0:
+            continue
         t += ia
 
         if t + l >= total_time:
             l = total_time - t
-            break
 
         points.append((t, "start"))
         points.append((t + l, "end"))
+        print(t, t + l)
 
 
     # merge overlapping segements
@@ -163,22 +168,29 @@ def genZ(total_time: float, length: float, inter_arrival: float):
     tp = TrafficPattern()
     bitrate = 0
     for i in range(len(points)):
-        if bitrate >= 1:
+        if bitrate >= 1 and points[i][0] != points[i - 1][0]:
             tp.add_interval(
-                    start=points[i - 1], 
-                    traffic_interval=IperfTrafficInterval(length=points[i] - points[i - 1], bitrate=bitrate)
+                    start=points[i - 1][0], 
+                    traffic_interval=IperfTrafficInterval(length=points[i][0] - points[i - 1][0], bitrate=bitrate)
             )
         if points[i][1] == "start":
             bitrate += 1000000
         else:
             bitrate -= 1000000
+
+    for interval in tp.intervals:
+        print(interval[0], interval[1].length + interval[0], interval[1].bitrate)
+
     return tp
 
 
 def run():
-    np.random.seed(123412)
+    # np.random.seed()
     phones = load_phones()
-    tps = [genZ(100, 3, 3) for phone in phones]
+    tps = [genZ(50, 5, 15) for phone in phones]
     generate_traffic(phones, tps)
 
-run()
+
+
+if __name__ == "__main__":
+    run()
