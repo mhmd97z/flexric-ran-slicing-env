@@ -9,7 +9,7 @@ import xapp_sdk as ric
 
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 def runner():

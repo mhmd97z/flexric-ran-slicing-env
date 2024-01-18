@@ -2,12 +2,13 @@ import logging
 import threading
 import json, time
 import prometheus_client as prom
+import sys
 from metrics import metrics_exporter as metrics
 from utils import get_imsi
 from configs import EXPORTER_PORT, EXPORTER_UPDATE_PERIOD, metrics_path
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 # get rid of prom bloat

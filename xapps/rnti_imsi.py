@@ -2,8 +2,9 @@ import time
 import json
 import threading
 import logging
+import sys
 from configs import rnti_imsi_path, rnti_teid_path, imsi_teid_path, TEID_IMSI_UPDATE_PERIOD, RNTI_TEID_UPDATE_PERIOD
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 rnti_imsi = {}

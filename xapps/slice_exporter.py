@@ -2,6 +2,7 @@ import logging
 import time
 import requests
 import threading
+import sys
 import prometheus_client as prom
 import pandas as pd
 from configs import PROMETHEUS_URL, SLICE_EXPORTER_PORT, EXPORTER_UPDATE_PERIOD, slice_stats_path
@@ -9,7 +10,7 @@ from metrics import metrics_exporter, metrics_exporter_slice_mapping
 from utils import get_imsi_slice
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 # get rid of bloat
