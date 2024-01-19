@@ -65,4 +65,6 @@ make
 
 # Example Usage
 ## running 
-
+```bash
+# 
+export PYTHONPATH=<path-to-flexric>/build/examples/xApp/python3":${PYTHONPATH}"
