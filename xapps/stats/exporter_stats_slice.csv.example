@@ -1,0 +1,3 @@
+slice_id,slice_dl_throughput,slice_ul_throughput,slice_phr,slice_cqi,slice_active_users
+1,82334.66666666667,2060728.888888889,25.5,14.0,2
+2,66032.0,7437038.222222223,29.0,15.0,1

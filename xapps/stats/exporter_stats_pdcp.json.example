@@ -1,0 +1,1 @@
+{"33021": {"pdcp": {"txpdu_pkts": 0, "txpdu_bytes": 0, "txpdu_sn": 0, "rxpdu_pkts": 0, "rxpdu_bytes": 0, "rxpdu_sn": 0, "rxpdu_oo_pkts": 0, "rxpdu_oo_bytes": 0, "rxpdu_dd_pkts": 0, "rxpdu_dd_bytes": 0, "rxpdu_ro_count": 0, "txsdu_pkts": 0, "txsdu_bytes": 0, "rxsdu_pkts": 0, "rxsdu_bytes": 0, "rnti": 33021, "mode": 0, "rbid": 3}}}
